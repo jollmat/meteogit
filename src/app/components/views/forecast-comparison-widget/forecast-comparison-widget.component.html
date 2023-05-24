@@ -1,0 +1,106 @@
+<div class="location-forecast d-flex flex-column flex-grow">
+
+    <ng-container *ngIf="locations">
+
+        <div class="location d-flex justify-content-between align-items-stretch" (dblclick)="toggleCollapse()">
+
+            <div class="d-flex flex-column px-2 py-1 text-light">
+                <div class="d-flex justify-content-between align-items-center">
+                    <span class="location-name">Comparison of all {{locations.length}} locations</span>
+                </div>
+            </div>
+
+            <div class="d-flex text-light py-2 pe-1">
+                <div class="d-flex flex-column justify-content-around align-items-center px-1">
+                    <div class="d-flex w-100 justify-content-around align-items-center">
+                        <i class="fas cursor-pointer me-1" [ngClass]="{'fa-chevron-down': collapsed, 'fa-chevron-up': !collapsed}" (click)="toggleCollapse()"></i>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+
+    </ng-container>
+
+    <ng-container *ngIf="!collapsed && blocksSort">
+
+        <div class="forecast d-flex flex-column justify-content-start align-items-start">
+            <div class="block d-flex p-0 w-100">
+                
+                <accordion>
+
+                    <ng-container *ngFor="let block of blocksSort" [ngSwitch]="block">
+
+                        <accordion-group *ngSwitchCase="'temperature'">
+                            <div class="d-flex justify-content-between align-items-center w-100" accordion-heading>
+                                <span>Temperature</span>
+                            </div>
+                            <ng-container *ngIf="chartTemperatureOptions; else loader">
+                                <highcharts-chart
+                                    #chartTemperature 
+                                    [Highcharts]="Highcharts"
+                                    [options]="chartTemperatureOptions"
+                                    style="width: 100%; height: 200px; display: block;"
+                                ></highcharts-chart>
+                            </ng-container>
+                        </accordion-group>
+    
+                        <accordion-group *ngSwitchCase="'apparent-temperature'">
+                            <div class="d-flex justify-content-between align-items-center w-100" accordion-heading>
+                                <span>Apparent temperature</span>
+                            </div>
+                            <ng-container *ngIf="chartApparentTemperatureOptions && chartsConfigured; else loader">
+                                <highcharts-chart 
+                                    #chartApparentTemperature
+                                    [Highcharts]="Highcharts"
+                                    [options]="chartApparentTemperatureOptions"
+                                    style="width: 100%; height: 200px; display: block;"
+                                ></highcharts-chart>
+                            </ng-container>
+                        </accordion-group>
+    
+                        <accordion-group *ngSwitchCase="'precipitation'">
+                            <div class="d-flex justify-content-between align-items-center w-100" accordion-heading>
+                                <span>Precipitation</span>
+                            </div>
+                            <ng-container *ngIf="chartPrecipitationOptions && chartsConfigured; else loader">
+                                <highcharts-chart 
+                                    #chartPrecipitation
+                                    [Highcharts]="Highcharts"
+                                    [options]="chartPrecipitationOptions"
+                                    style="width: 100%; height: 200px; display: block;"
+                                ></highcharts-chart>
+                            </ng-container>
+                        </accordion-group>
+    
+                        <accordion-group *ngSwitchCase="'precipitation-probability'">
+                            <div class="d-flex justify-content-between align-items-center w-100" accordion-heading>
+                                <span>Precipitation probability</span>
+                            </div>
+                            <ng-container *ngIf="chartPrecipitationProbabilityOptions && chartsConfigured; else loader">
+                                <highcharts-chart 
+                                    #chartPrecipitationProbability
+                                    [Highcharts]="Highcharts"
+                                    [options]="chartPrecipitationProbabilityOptions"
+                                    style="width: 100%; height: 200px; display: block;"
+                                ></highcharts-chart>
+                            </ng-container>
+                        </accordion-group>
+
+                    </ng-container>
+
+                    
+                    
+                  </accordion>
+
+            </div>
+        </div>
+
+    </ng-container>
+    
+</div>
+
+<ng-template #loader>
+    <div class="loader w-100 h-100 d-flex p-3">Loading...</div>
+</ng-template>
