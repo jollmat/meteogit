@@ -251,10 +251,11 @@
 </ng-template>
 
 <ng-template let-column="column" let-value="value" #alertInfo>
-    <ng-container *ngIf="(column==='TEMPERATURE' || column==='APPARENT_TEMPERATURE') && (value<0 || value>=30)">
-        <span class="me-1 fas fa-warning" [ngClass]="{'text-warning':value>=30 && value<40, 'text-danger fa-beat-fade': value>=40}"></span>
+    <ng-container *ngIf="(column==='TEMPERATURE' || column==='APPARENT_TEMPERATURE') && (value<=0 || value>=30)">
+        <span class="me-1 fas fa-warning" [ngClass]="{'text-warning':(value<=0 && value>-5) || (value>=30 && value<40), 'text-danger fa-beat-fade': (value>=40 || value<=-5)}"></span>
     </ng-container>
-    <ng-container *ngIf="column==='PRECIPITATION'">
+    <ng-container *ngIf="column==='PRECIPITATION' && value>=5">
+        <span class="me-1 fas fa-warning" [ngClass]="{'text-warning':(value<20 && value>=5), 'text-danger fa-beat-fade': (value>=20)}"></span>
     </ng-container>
     <ng-container *ngIf="column==='PRECIPITATION_PROBABILITY' && value>=75">
         <span class="me-1 fas fa-warning text-warning"></span>
