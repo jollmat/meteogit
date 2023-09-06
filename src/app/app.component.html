@@ -95,6 +95,9 @@
                                 Location
                                 <ng-container [ngTemplateOutlet]="sortInfo" [ngTemplateOutletContext]="{column: 'location'}"></ng-container>
                             </th>
+                            <th class="text-end" title="Time">
+                                Time
+                            </th>
                             <th class="text-end cursor-pointer" title="Temperature" (click)="sortBy('temperature')">
                                 Temp.
                                 <ng-container [ngTemplateOutlet]="sortInfo" [ngTemplateOutletContext]="{column: 'temperature'}"></ng-container>
@@ -175,6 +178,9 @@
             </td>
             <td>                
                 {{location.name}} <span class="country_code"><small>({{location.country_code.toLowerCase()}})</small></span>
+            </td>
+            <td class="text-end">                
+                {{getLocationLocaleHour(location)}} h.
             </td>
             <td class="text-end">
                 <ng-container [ngTemplateOutlet]="alertInfo" [ngTemplateOutletContext]="{column:'TEMPERATURE', value: currentForecast.temperature_2m}"></ng-container>

@@ -313,6 +313,13 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
     return moment(new Date(str)).format('HH:mm');
   }
 
+  getLocationLocaleHour(location: LocationInterface): string {
+    if (!location?.timezone) {
+      return '-';
+    }
+    return moment.tz(new Date(),location?.timezone).format('HH:mm'); ;
+  }
+
   checkCurrentHour() {
     if (this.selectedLocations?.length>0 && this.getForecast(this.selectedLocations[0].id)) {
       const locationForecast: ForecastInterface | undefined = this.getForecast(this.selectedLocations[0].id);
