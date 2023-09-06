@@ -11,3 +11,60 @@ input {
 .fa-bars {
     font-size: 24px;
 }
+
+.table_title {
+    color: orange;
+}
+
+.table {
+    color: #ccc;
+    thead {
+        background-color: #444;
+        position: sticky;
+        top: 0px;
+        z-index: 1000;
+
+        tr {
+            background-color: #333;
+            th {
+                &.current_time {
+                    /* color: gold; */
+                    background-color: #444;
+                }
+                &.country {
+                    width: 85px;
+                }
+            }
+
+            &:first-child {
+                background-color: transparent;
+            }
+
+            &:not(:first-child){
+                position: relative;
+                top: -1px;
+            }
+        }
+    }
+    tbody {
+        color: #fff;
+        tr {
+            td {
+                color: #fff;
+                span.country_code {
+                    color: #ccc;
+                }
+
+                &.current_time {
+                    /* color: gold; */
+                    background-color: #6C6C6C;
+                }
+            }
+        }
+    }
+}
+
+tr>th:first-child,tr>td:first-child {
+    position: sticky;
+    left: 0;
+}

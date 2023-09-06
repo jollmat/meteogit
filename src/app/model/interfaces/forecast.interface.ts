@@ -4,6 +4,7 @@ export interface ForecastInterface {
         precipitation: string,
         precipitation_probability: string,
         temperature_2m: string,
+        windspeed_10m: string,
         time: string[]
     };
     hourly: WeatherForecastHourly,
@@ -18,6 +19,7 @@ export interface WeatherForecastHourly {
     precipitation: number[],
     precipitation_probability: number[],
     temperature_2m: number[],
+    windspeed_10m: number[],
     time: string[]
 }
 
@@ -26,5 +28,6 @@ export interface WeatherForecastHourlyUnit {
     precipitation: number,
     precipitation_probability: number,
     temperature_2m: number,
+    windspeed_10m: number,
     time: string
 }

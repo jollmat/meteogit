@@ -16,7 +16,7 @@ export class MeteoService {
     const url: string = 'https://api.open-meteo.com/v1/forecast?';
     const dateFrom: string = moment().subtract(7, 'days').format('YYYY-MM-DD');
     const dateTo: string = moment().add(7, 'days').format('YYYY-MM-DD');
-    return this.http.get<ForecastInterface>(url + query + `&start_date=${dateFrom}&end_date=${dateTo}`);
+    return this.http.get<ForecastInterface>(url + query + `&start_date=${dateFrom}&end_date=${dateTo}&hourly=windspeed_10m`);
   }
 
   getCurrentHourlyForecast(forecast: ForecastInterface): WeatherForecastHourlyUnit | undefined {
@@ -33,6 +33,7 @@ export class MeteoService {
             precipitation: forecast.hourly.precipitation[idx],
             precipitation_probability: forecast.hourly.precipitation_probability[idx],
             temperature_2m: forecast.hourly.temperature_2m[idx],
+            windspeed_10m: forecast.hourly.windspeed_10m[idx],
             time: forecast.hourly.time[idx],
           };
         }

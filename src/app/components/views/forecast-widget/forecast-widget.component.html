@@ -13,10 +13,6 @@
                         <i class="flag-icon flag-icon-{{location.country_code.toLowerCase()}}"></i>
                     </div>
                     <small class="flex-grow-1" title="{{((location.admin2)?location.admin2:'')+((location.admin2 && location.admin1)?', ':'')+((location.admin1)?location.admin1:'')+' ('+location.country+')'}}">
-                        <!--
-                        <span *ngIf="location.admin2">{{location.admin2}}</span>
-                        <span *ngIf="location.admin2 && location.admin1">, </span>
-                        -->
                         <span *ngIf="location.admin1">{{location.admin1}}</span> 
                         <span class="ms-1">({{location.country}})</span>
                     </small>
