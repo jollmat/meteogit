@@ -68,3 +68,28 @@ tr>th:first-child,tr>td:first-child {
     position: sticky;
     left: 0;
 }
+
+.badge {
+    font-size: 11px;
+    padding: 8px 10px;
+    &.badge-pill {
+        border: 1px solid transparent;
+        color: #666;
+        &.badge-danger {
+            border: 1px solid #dc0028;
+            color: #fff;
+        }
+        &.badge-danger-outset {
+            border: 1px solid #dc0028;
+            background-color: #fff;
+        }
+        &.badge-info {
+            border: 1px solid #0dcaf0;
+            color: #fff;
+        }
+        &.badge-info-outset {
+            border: 1px solid #0dcaf0;
+            background-color: #fff;
+        }
+    }
+}

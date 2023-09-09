@@ -1,5 +1,4 @@
 <div class="w-100 p-4">
-
     <form role="form" [formGroup]="form">
         <div class="d-flex justify-content-between align-items-center">
             <input class="search-input form-control" (focus)="searchLocations();" formControlName="locationSearch" placeholder="Type a location to search" #searchInput>
@@ -44,6 +43,17 @@
 
     <ng-container *ngIf="selectedLocations.length>0 && locations">
 
+        <div class="d-flex flex-column justify-content-start align-items-start w-100 px-2 mt-3" *ngIf="getLocationsAlerts().length>0">
+            <div class="badge badge-pill badge-danger cursor-pointer w-100 bg-light text-danger" (click)="showAlerts=!showAlerts">
+                <span class="fas fa-warning fa-beat-fade text-danger me-2"></span>
+                {{getLocationsAlerts().length}} location alerts
+                <span class="ms-2 fas" [ngClass]="{'fa-chevron-down': !showAlerts,'fa-chevron-up': showAlerts}"></span>
+            </div>
+            <div class="d-flex w-100 mt-2" *ngIf="showAlerts">
+                <ng-container [ngTemplateOutlet]="alerts"></ng-container>
+            </div>
+        </div>
+
         <ng-container *ngIf="viewType==='WIDGETS'">
             <ng-container *ngIf="selectedLocations.length>1">
                 <div class="d-flex flex-wrap justify-content-start align-items-start w-100 p-0 mt-3">
@@ -75,7 +85,7 @@
                 <table class="table table-hover">
                     <thead>
                         <tr>
-                            <th class="px-0 pb-2" [attr.colspan]="tableViewType==='GENERAL'?8:13">
+                            <th class="px-0 pb-2" [attr.colspan]="tableViewType==='GENERAL'?9:14">
                                 <div class="btn-group w-100" role="group" aria-label="Basic example">
                                     <button type="button" (click)="tableViewType='GENERAL'" [ngClass]="{active:tableViewType==='GENERAL'}" class="btn btn-sm btn-secondary w-20" title="General">General <small>({{getCurrentTime()}}h.)</small></button>
                                     <button type="button" (click)="tableViewType='TEMPERATURE'" [ngClass]="{active:tableViewType==='TEMPERATURE'}" class="btn btn-sm btn-secondary w-20" title="Temperature">Temp. <small>(ºC)</small></button>
@@ -86,7 +96,7 @@
                                 </div>
                             </th>
                         </tr>
-                        <tr *ngIf="tableViewType==='GENERAL'">
+                        <tr *ngIf="tableViewType==='GENERAL'" style="top:-1px;">
                             <th class="text-center cursor-pointer country" (click)="sortBy('country')">
                                 Country
                                 <ng-container [ngTemplateOutlet]="sortInfo" [ngTemplateOutletContext]="{column: 'country'}"></ng-container>
@@ -120,7 +130,7 @@
                             </th>
                             <th></th>
                         </tr>
-                        <tr *ngIf="tableViewType!=='GENERAL'">
+                        <tr *ngIf="tableViewType!=='GENERAL'" style="top:-1px;">
                             <th class="text-center cursor-pointer country" (click)="sortBy('country')">
                                 Country
                                 <ng-container [ngTemplateOutlet]="sortInfo" [ngTemplateOutletContext]="{column: 'country'}"></ng-container>
@@ -235,10 +245,10 @@
     </ng-container>
     <ng-container *ngIf="!currentForecast || !forecast">
         <tr *ngIf="tableViewType==='GENERAL'">
-            <td colspan="6">Loading forecast...</td>
+            <td colspan="13">Loading forecast...</td>
         </tr>
         <tr *ngIf="tableViewType!=='GENERAL'">
-            <td colspan="12">Loadng forecast...</td>
+            <td colspan="13">Loadng forecast...</td>
         </tr>
     </ng-container>
 </ng-template>
@@ -251,16 +261,114 @@
 </ng-template>
 
 <ng-template let-column="column" let-value="value" #alertInfo>
-    <ng-container *ngIf="(column==='TEMPERATURE' || column==='APPARENT_TEMPERATURE') && (value<=0 || value>=30)">
-        <span class="me-1 fas fa-warning" [ngClass]="{'text-warning':(value<=0 && value>-5) || (value>=30 && value<40), 'text-danger fa-beat-fade': (value>=40 || value<=-5)}"></span>
+    <ng-container *ngIf="(column==='TEMPERATURE' || column==='APPARENT_TEMPERATURE') && (value<=alertLimits.temperature.warningLow || value>=alertLimits.temperature.warningHigh)">
+        <span class="me-1 fas fa-warning" [ngClass]="{
+            'text-warning':(value<=alertLimits.temperature.warningLow && value>alertLimits.temperature.dangerLow) || (value>=alertLimits.temperature.warningHigh && value<alertLimits.temperature.dangerHigh), 
+            'text-danger fa-beat-fade': (value>=alertLimits.temperature.dangerHigh || value<=alertLimits.temperature.dangerLow)
+        }"></span>
     </ng-container>
-    <ng-container *ngIf="column==='PRECIPITATION' && value>=5">
-        <span class="me-1 fas fa-warning" [ngClass]="{'text-warning':(value<20 && value>=5), 'text-danger fa-beat-fade': (value>=20)}"></span>
+    <ng-container *ngIf="column==='PRECIPITATION' && value>=alertLimits.precipitation.warning">
+        <span class="me-1 fas fa-warning" [ngClass]="{
+            'text-warning':(value<alertLimits.precipitation.danger && value>=alertLimits.precipitation.warning), 
+            'text-danger fa-beat-fade': (value>=alertLimits.precipitation.danger)
+        }"></span>
     </ng-container>
-    <ng-container *ngIf="column==='PRECIPITATION_PROBABILITY' && value>=75">
+    <ng-container *ngIf="column==='PRECIPITATION_PROBABILITY' && value>=alertLimits.precipitation_probability.warning">
         <span class="me-1 fas fa-warning text-warning"></span>
     </ng-container>
-    <ng-container *ngIf="column==='WIND_SPEED' && value>=20">
-        <span class="me-1 fas fa-warning" [ngClass]="{'text-warning':value>=20 && value<40, 'text-danger fa-beat-fade': value>=40}"></span>
+    <ng-container *ngIf="column==='WIND_SPEED' && value>=alertLimits.wind_speed.warning">
+        <span class="me-1 fas fa-warning" [ngClass]="{
+            'text-warning':value>=alertLimits.wind_speed.warning && value<alertLimits.wind_speed.danger, 
+            'text-danger fa-beat-fade': value>=alertLimits.wind_speed.danger
+        }"></span>
     </ng-container>
+</ng-template>
+
+<ng-template #alerts>
+    <div class="d-flex flex-column w-100 p-2">
+
+        <table>
+            <tbody>
+                <ng-container *ngFor="let locationAlert of getLocationsAlerts()">
+                    <tr>
+                        <td class="text-light w-20">
+                            {{locationAlert.location.name}} <small class="ms-2">({{locationAlert.location.country_code}})</small>
+                        </td>
+                        <td>
+                            <div class="d-flex justify-content-start">
+                                <ng-container *ngFor="let alert of locationAlert.alerts">
+
+                                    <ng-container *ngIf="alert.type==='temperature'">
+                                        <ng-container *ngIf="alert.value>=alertLimits.temperature.dangerHigh">
+                                            <div class="badge badge-pill badge-danger-outset me-1">
+                                                <span class="fas fa-temperature-high me-1 text-danger"></span>
+                                                Temperature >= {{alertLimits.temperature.dangerHigh}}ºC
+                                            </div>
+                                        </ng-container>
+                                        <ng-container *ngIf="alert.value<=alertLimits.temperature.dangerLow">
+                                            <div class="badge badge-pill badge-info-outset me-1">
+                                                <span class="fas fa-temperature-low me-1 text-info"></span>
+                                                Temperature <= {{alertLimits.temperature.dangerLow}}ºC
+                                            </div>
+                                        </ng-container>
+                                    </ng-container>
+
+                                    <ng-container *ngIf="alert.type==='apparent_temperature'">
+                                        <ng-container *ngIf="alert.value>=alertLimits.temperature.dangerHigh">
+                                            <div class="badge badge-pill badge-danger-outset me-1">
+                                                <span class="fas fa-temperature-high me-1 text-danger"></span>
+                                                Apparent temperature >= {{alertLimits.temperature.dangerHigh}}ºC
+                                            </div>
+                                        </ng-container>
+                                        <ng-container *ngIf="alert.value<=alertLimits.temperature.dangerLow">
+                                            <div class="badge badge-pill badge-info-outset me-1">
+                                                <span class="fas fa-temperature-low me-1 text-info"></span>
+                                                Apparent temperature <= {{alertLimits.temperature.dangerLow}}ºC
+                                            </div>
+                                        </ng-container>
+                                    </ng-container>
+
+                                    <ng-container *ngIf="alert.type==='precipitation'">
+                                        <div class="badge badge-pill badge-danger-outset me-1">
+                                            <span *ngIf="alert.value>=alertLimits.precipitation.danger">
+                                                <span class="fas fa-cloud-rain me-1 text-info"></span>
+                                                Precipitation >= {{alertLimits.precipitation.danger}} mm
+                                            </span>
+                                        </div>
+                                    </ng-container>
+
+                                    <ng-container *ngIf="alert.type==='wind_speed'">
+                                        <div class="badge badge-pill badge-danger-outset me-1">
+                                            <span *ngIf="alert.value>=alertLimits.wind_speed.danger">
+                                                <span class="fas fa-wind me-1"></span>
+                                                Wind speed >= {{alertLimits.wind_speed.danger}} Km/h
+                                            </span>
+                                        </div>                                        
+                                    </ng-container>
+                                    
+                                </ng-container>
+                            </div>
+                        </td>
+                    </tr>
+                </ng-container>
+            </tbody>
+        </table>
+        <!--
+        <ng-container *ngFor="let locationAlert of getLocationsAlerts()">
+            <div class="d-flex w-100 text-light mb-1">
+                <div class="d-flex align-items-center" style="width:220px;">{{locationAlert.location.name}} <small class="ms-2">({{locationAlert.location.country_code}})</small></div>
+                <div class="d-flex justify-content-start">
+                    <ng-container *ngFor="let alert of locationAlert.alerts">
+                        <div class="badge badge-pill badge-danger">
+                            <ng-container *ngIf="alert.type==='temperature'">
+                                <span *ngIf="alert.value>=alertLimits.temperature.dangerHigh">Temperature equals or higher than {{alertLimits.temperature.dangerHigh}}ºC</span>
+                                <span *ngIf="alert.value<=alertLimits.temperature.dangerLow">Temperature equals or lower than {{alertLimits.temperature.dangerLow}}ºC</span>
+                            </ng-container>
+                        </div>
+                    </ng-container>
+                </div>
+            </div>
+        </ng-container>
+        -->
+    </div>
 </ng-template>

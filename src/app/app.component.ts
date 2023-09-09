@@ -9,6 +9,7 @@ import { MeteoService } from './services/meteo.service';
 
 import moment from 'moment-timezone';
 import { DeviceDetectorService } from 'ngx-device-detector';
+import { AlertLimits } from './globals';
 
 @Component({
   selector: 'app-root',
@@ -64,6 +65,9 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
   geolocationSubs?: Subscription;
 
   checkCurrentHourInterval: any;
+
+  showAlerts: boolean = false;
+  alertLimits = AlertLimits;
 
   constructor(
     private meteoService: MeteoService,
@@ -329,6 +333,46 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
         }) - 3;
       }
     }
+  }
+
+  getLocationsAlerts(): { location: LocationInterface, alerts: { type: string, value: number, time: string }[] }[] {
+    if (this.forecasts.length===0 || this.forecasts.length!==this.selectedLocations.length) {
+      return [];
+    }
+    let locationsAlerts: { location: LocationInterface, alerts: { type: string, value: number, time: string }[] }[] = [];
+    
+    this.selectedLocations.forEach((_location) => {
+      let alerts: { type: string, value: number, time: string }[] = [];
+      const forecast: ForecastInterface | undefined = this.getForecast(_location.id);
+
+      if(forecast) {
+        const forecastHourly: WeatherForecastHourly = forecast.hourly;
+        const idx: number = this.tableColumnIndexFrom+3;
+
+        if (forecastHourly.temperature_2m[idx]>=this.alertLimits.temperature.dangerHigh ||
+            forecastHourly.temperature_2m[idx]<=this.alertLimits.temperature.dangerLow) {
+            alerts.push({ type:'temperature', value: forecastHourly.temperature_2m[idx], time: forecastHourly.time[idx] });
+        }
+        if (forecastHourly.apparent_temperature[idx]>=this.alertLimits.temperature.dangerHigh ||
+          forecastHourly.apparent_temperature[idx]<=this.alertLimits.temperature.dangerLow) {
+          alerts.push({ type:'apparent_temperature', value: forecastHourly.apparent_temperature[idx], time: forecastHourly.time[idx] });
+        }
+        if (forecastHourly.precipitation[idx]>=this.alertLimits.precipitation.danger) {
+          alerts.push({ type:'precipitation', value: forecastHourly.precipitation[idx], time: forecastHourly.time[idx] });
+        }
+        if (forecastHourly.windspeed_10m[idx]>=this.alertLimits.wind_speed.danger) {
+          alerts.push({ type:'wind_speed', value: forecastHourly.windspeed_10m[idx], time: forecastHourly.time[idx] });
+        }
+      }
+      if (alerts.length>0) {
+        locationsAlerts.push({
+          location: _location,
+          alerts: alerts
+        });
+      }
+      
+    });
+    return locationsAlerts;
   }
 
   ngOnInit(): void {
