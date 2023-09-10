@@ -60,6 +60,12 @@ input {
                     background-color: #6C6C6C;
                 }
             }
+
+            &.selectedLocation {
+                td {
+                    background-color: #6C6C6C;
+                }
+            }
         }
     }
 }

@@ -1,7 +1,7 @@
 import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { DragulaService } from 'ng2-dragula';
-import { debounceTime, distinctUntilChanged, filter, fromEvent, Subscription, switchMap, tap } from 'rxjs';
+import { BehaviorSubject, debounceTime, distinctUntilChanged, filter, fromEvent, Subscription, switchMap, tap } from 'rxjs';
 import { ForecastComparisonWidgetComponent } from './components/views/forecast-comparison-widget/forecast-comparison-widget.component';
 import { ForecastInterface, WeatherForecastHourly, WeatherForecastHourlyUnit } from './model/interfaces/forecast.interface';
 import { LocationInterface } from './model/interfaces/location.interface';
@@ -69,6 +69,11 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
   showAlerts: boolean = false;
   alertLimits = AlertLimits;
 
+  dragableWidgetsSubs$: BehaviorSubject<boolean> = new BehaviorSubject(false);
+  dragableWidgets: boolean = false;
+
+  selectedLocation?: number;
+
   constructor(
     private meteoService: MeteoService,
     private deviceService: DeviceDetectorService,
@@ -84,6 +89,10 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
       })
       );
     }
+
+  setDragable(dragable: boolean) {
+    this.dragableWidgetsSubs$.next(dragable);
+  }
 
   sortBy(fieldName?: string, sortDir?: 'ASC' | 'DESC', dateStr?: string) {
 
@@ -372,7 +381,23 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
       }
       
     });
-    return locationsAlerts;
+    return locationsAlerts.sort((a,b) => {
+      return a.location.name>b.location.name ? 1 : -1;
+    });
+  }
+
+  goToAlert(alertType: string, locationId: number, sortDir?: 'ASC' | 'DESC') {
+    this.tableViewType='GENERAL';
+    this.setSelectedLocation(locationId);
+    this.sortBy(alertType, sortDir);
+  }
+
+  setSelectedLocation(locationId?: number) {
+    this.selectedLocation = locationId;
+  }
+
+  toggleSelectedLocation(locationId: number) {
+    this.setSelectedLocation((this.selectedLocation===locationId)? undefined : locationId);
   }
 
   ngOnInit(): void {
@@ -401,6 +426,12 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
         this.sortBy(this.sortConfig.field, this.sortConfig.dir, this.sortConfig.dateStr);
       }
     }
+
+    this.dragableWidgetsSubs$.subscribe((_dragable) => {
+      this.dragableWidgets = _dragable;
+    });
+
+    this.setDragable(false);
 
     setInterval(() => {
       this.reloadForecasts();
