@@ -92,39 +92,57 @@
                     <thead>
                         <tr>
                             <th class="px-0 pb-2" style="z-index: 1001;" [attr.colspan]="tableViewType==='GENERAL'?9:14">
-                                <div ngbDropdown class="d-inline-block ms-3 mb-2">
-                                    <button type="button" class="btn" id="dropdownBasic2" [disabled]="selectedLocations.length===0" ngbDropdownToggle>
-                                        <span *ngIf="tableViewType==='GENERAL'">General</span>
-                                        <span *ngIf="tableViewType==='TEMPERATURE'">Temperature <small>(ºC)</small></span>
-                                        <span *ngIf="tableViewType==='APPARENT_TEMPERATURE'">Apparent temperature <small>(ºC)</small></span>
-                                        <span *ngIf="tableViewType==='PRECIPITATION'">Precipitation <small>(mm)</small></span>
-                                        <span *ngIf="tableViewType==='PRECIPITATION_PROBABILITY'">Precipitation probability <small>(%)</small></span>
-                                        <span *ngIf="tableViewType==='WIND_SPEED'">Wind speed <small>(Km/h)</small></span>
-                                    </button>
-                                    <div ngbDropdownMenu aria-labelledby="dropdownBasic2">
-                                        <button ngbDropdownItem class="p-2" *ngIf="tableViewType!=='GENERAL'" (click)="tableViewType='GENERAL'">
-                                            General
+                                <div class="d-flex justify-content-between w-100">
+                                    <div ngbDropdown class="d-inline-block ms-3 mb-2">
+                                        <button type="button" class="btn" id="dropdownBasic2" [disabled]="selectedLocations.length===0" ngbDropdownToggle>
+                                            <span *ngIf="tableViewType==='GENERAL'">General</span>
+                                            <span *ngIf="tableViewType==='TEMPERATURE'">Temperature <small>(ºC)</small></span>
+                                            <span *ngIf="tableViewType==='APPARENT_TEMPERATURE'">Apparent temperature <small>(ºC)</small></span>
+                                            <span *ngIf="tableViewType==='PRECIPITATION'">Precipitation <small>(mm)</small></span>
+                                            <span *ngIf="tableViewType==='PRECIPITATION_PROBABILITY'">Precipitation probability <small>(%)</small></span>
+                                            <span *ngIf="tableViewType==='WIND_SPEED'">Wind speed <small>(Km/h)</small></span>
                                         </button>
-                                        <button ngbDropdownItem class="p-2" *ngIf="tableViewType!=='TEMPERATURE'" (click)="tableViewType='TEMPERATURE'">
-                                            Temperature <small>(ºC)</small>
-                                        </button>
-                                        <button ngbDropdownItem class="p-2" *ngIf="tableViewType!=='APPARENT_TEMPERATURE'" (click)="tableViewType='APPARENT_TEMPERATURE'">
-                                            Apparent temperature <small>(ºC)</small>
-                                        </button>
-                                        <button ngbDropdownItem class="p-2" *ngIf="tableViewType!=='PRECIPITATION'" (click)="tableViewType='PRECIPITATION'">
-                                            Precipitation <small>(mm)</small>
-                                        </button>
-                                        <button ngbDropdownItem class="p-2" *ngIf="tableViewType!=='PRECIPITATION_PROBABILITY'" (click)="tableViewType='PRECIPITATION_PROBABILITY'">
-                                            Precipitation probability <small>(%)</small>
-                                        </button>
-                                        <button ngbDropdownItem class="p-2" *ngIf="tableViewType!=='WIND_SPEED'" (click)="tableViewType='WIND_SPEED'">
-                                            Wind speed <small>(Km/h)</small>
-                                        </button>
+                                        <div ngbDropdownMenu aria-labelledby="dropdownBasic2">
+                                            <button ngbDropdownItem class="p-2" *ngIf="tableViewType!=='GENERAL'" (click)="tableViewType='GENERAL'">
+                                                General
+                                            </button>
+                                            <button ngbDropdownItem class="p-2" *ngIf="tableViewType!=='TEMPERATURE'" (click)="tableViewType='TEMPERATURE'">
+                                                Temperature <small>(ºC)</small>
+                                            </button>
+                                            <button ngbDropdownItem class="p-2" *ngIf="tableViewType!=='APPARENT_TEMPERATURE'" (click)="tableViewType='APPARENT_TEMPERATURE'">
+                                                Apparent temperature <small>(ºC)</small>
+                                            </button>
+                                            <button ngbDropdownItem class="p-2" *ngIf="tableViewType!=='PRECIPITATION'" (click)="tableViewType='PRECIPITATION'">
+                                                Precipitation <small>(mm)</small>
+                                            </button>
+                                            <button ngbDropdownItem class="p-2" *ngIf="tableViewType!=='PRECIPITATION_PROBABILITY'" (click)="tableViewType='PRECIPITATION_PROBABILITY'">
+                                                Precipitation probability <small>(%)</small>
+                                            </button>
+                                            <button ngbDropdownItem class="p-2" *ngIf="tableViewType!=='WIND_SPEED'" (click)="tableViewType='WIND_SPEED'">
+                                                Wind speed <small>(Km/h)</small>
+                                            </button>
+                                        </div>
                                     </div>
-                                </div>
+                                    <ng-container *ngIf="tableViewType==='GENERAL' && !isMobile">
+                                        <div ngbDropdown class="d-inline-block me-3 mb-2">
+                                            <button type="button" class="btn" id="dropdownBasic3" [disabled]="selectedLocations.length===0" ngbDropdownToggle>
+                                                <span *ngIf="generalTableViewType==='TABLE'">Table</span>
+                                                <span *ngIf="generalTableViewType==='MAP'">Map</span>
+                                            </button>
+                                            <div ngbDropdownMenu aria-labelledby="dropdownBasic3">
+                                                <button ngbDropdownItem class="p-2" *ngIf="generalTableViewType!=='TABLE'" (click)="generalTableViewType='TABLE'">
+                                                    Table
+                                                </button>
+                                                <button ngbDropdownItem class="p-2" *ngIf="generalTableViewType!=='MAP'" (click)="generalTableViewType='MAP';initMap()">
+                                                    Map
+                                                </button>                                            
+                                            </div>
+                                        </div>
+                                    </ng-container>    
+                                </div>             
                             </th>
                         </tr>
-                        <tr *ngIf="tableViewType==='GENERAL'" style="top:-1px;">
+                        <tr *ngIf="tableViewType==='GENERAL' && generalTableViewType==='TABLE'" style="top:-1px;">
                             <th class="text-center cursor-pointer country" (click)="sortBy('country')">
                                 Country
                                 <ng-container [ngTemplateOutlet]="sortInfo" [ngTemplateOutletContext]="{column: 'country'}"></ng-container>
@@ -158,6 +176,11 @@
                             </th>
                             <th></th>
                         </tr>
+                        <tr [hidden]="tableViewType!=='GENERAL' || generalTableViewType!=='MAP'">
+                            <th colspan="9">
+                                <div class="map" id="map">Map here</div>
+                            </th>
+                        </tr>
                         <tr *ngIf="tableViewType!=='GENERAL'" style="top:-1px;">
                             <th class="text-center cursor-pointer country" (click)="sortBy('country')">
                                 Country
@@ -187,7 +210,8 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <ng-container 
+                        <ng-container *ngIf="tableViewType!=='GENERAL' || generalTableViewType!=='MAP'">
+                            <ng-container 
                             [ngTemplateOutlet]="forecastRow" 
                             [ngTemplateOutletContext]="{
                                 location: location,
@@ -197,6 +221,7 @@
                                 forecastUnits: getForecast(location.id)?.hourly_units
                             }"
                             *ngFor="let location of selectedLocations; let locationIndex = index;"></ng-container>
+                        </ng-container>
                     </tbody>
                 </table>
             </div>            

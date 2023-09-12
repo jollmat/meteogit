@@ -6,8 +6,8 @@ export const AlertLimits = {
         dangerHigh: 40
     },
     precipitation: {
-        warning: 5,
-        danger: 10
+        warning: 20,
+        danger: 60
     },
     precipitation_probability: {
         warning: 75
