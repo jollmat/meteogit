@@ -225,6 +225,9 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
       if (this.comparisonWidget) {
         this.selectedLocations.forEach((_loc) => this.loadForecast(_loc, 'reloadForecasts()'));
       }
+      if (this.viewType==='TABLE' && this.generalTableViewType==='MAP') {
+        this.initMap();
+      }
     }
   }
 
@@ -238,6 +241,9 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
       if (this.comparisonWidget) {
         //this.comparisonWidget.configCharts();
         this.selectedLocations.forEach((_loc) => this.loadForecast(_loc, 'reloadForecasts()'));
+      }
+      if (this.viewType==='TABLE' && this.generalTableViewType==='MAP') {
+        this.initMap();
       }
     }
   }

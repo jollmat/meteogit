@@ -79,7 +79,7 @@ export class MeteoService {
   }
 
   getPrecipitationColor(precipitation: number): string {
-    const colors: string[] = ['#ffffff','#3FA0FF','#72D8FF','#AAF7FF','#E0FFFF'];
+    const colors: string[] = ['#ffffff','#9b78ff','#6f4ec2','#442788','#190253'];
     let colIdx: number = 0;
     if (precipitation===0) {
       colIdx = 0;
@@ -96,7 +96,7 @@ export class MeteoService {
   }
 
   getWindSpeedColor(speed: number): string {
-    const colors: string[] = ['#264CFF','#3FA0FF','#72D8FF','#AAF7FF','#E0FFFF','#FFFFBF','#FFE099','#FFAD72','#F76D5E','#D82632','#A50021', '#A50021'];
+    const colors: string[] = ['#f288fc','#df7bec','#cd6fdd','#bb63cd','#a957be','#974baf','#863fa0','#763391','#652883','#551d74','#451166', '#360558'];
     let colIdx: number = 0;
     if (speed===0) {
       colIdx = 0;
