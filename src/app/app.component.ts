@@ -29,6 +29,7 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
   tableViewType: 'GENERAL' | 'TEMPERATURE' | 'APPARENT_TEMPERATURE' | 'PRECIPITATION' | 'PRECIPITATION_PROBABILITY' | 'WIND_SPEED' = 'GENERAL';
   tableColumnIndexFrom: number = -1;
   generalTableViewType: 'TABLE' | 'MAP' = 'TABLE';
+  mapValueType: 'TEMPERATURE' | 'APPARENT_TEMPERATURE' | 'PRECIPITATION' | 'WIND_SPEED' = 'TEMPERATURE';
 
   @ViewChild('searchInput') searchInput!: ElementRef;
 
@@ -79,6 +80,7 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
   selectedLocation?: number;
 
   map: any;
+  mapMarkers: any[] = [];
 
   constructor(
     private meteoService: MeteoService,
@@ -407,18 +409,29 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   initMap() {
+
     setTimeout(() => {
-      this.map = L.map('map', {
-        center: [48.20807,16.37320],
-        attributionControl: false,
-        zoom: 4
-      });
+
+      if (!this.map) {
+        this.map = L.map('map', {
+          center: [48.20807,16.37320],
+          attributionControl: false,
+          zoom: 4
+        });
+    
+        const tiles = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          maxZoom: 18,
+          minZoom: 3,
+          attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+        });
   
-      const tiles = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        maxZoom: 18,
-        minZoom: 3,
-        attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-      });
+        tiles.addTo(this.map);
+      } else {
+        this.mapMarkers.forEach((_marker) => {
+          this.map.removeLayer(_marker)
+        });
+        this.mapMarkers = [];
+      }      
 
       this.selectedLocations.forEach((_location) => {
         const lat = _location.latitude;
@@ -426,24 +439,50 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
 
         const locationForecasts: ForecastInterface | undefined = this.getForecast(_location.id);
         const forecast = this.getCurrentForecast(locationForecasts);
-        
+
+        let iconHtml = '';
+
+        switch(this.mapValueType) {
+          case 'TEMPERATURE':
+            iconHtml = "<div title=\""+_location.name+"\" style='background-color:"+this.getTemperatureColor((forecast) ? forecast.temperature_2m : 0)+";color:white;text-align:center;border-radius:25px;padding: 5px 3px;position: relative;top: 20px;' class='marker-pin'>"+((forecast) ? forecast.temperature_2m : 0)+"</div>";
+            break;
+          case 'APPARENT_TEMPERATURE':
+            iconHtml = "<div title=\""+_location.name+"\" style='background-color:"+this.getTemperatureColor((forecast) ? forecast.apparent_temperature : 0)+";color:white;text-align:center;border-radius:25px;padding: 5px 3px;position: relative;top: 20px;' class='marker-pin'>"+((forecast) ? forecast.apparent_temperature : 0)+"</div>";
+            break;
+          case 'PRECIPITATION':
+            iconHtml = "<div title=\""+_location.name+"\" style='color:blue;background-color:"+this.getPrecipitationColor((forecast) ? forecast.precipitation : 0)+";text-align:center;border-radius:25px;padding: 5px 3px;position: relative;top: 20px;' class='marker-pin'>"+((forecast) ? forecast.precipitation : 0)+"</div>";
+            break;
+          case 'WIND_SPEED':
+            iconHtml = "<div title=\""+_location.name+"\" style='background-color:"+this.getWindSpeedColor((forecast) ? forecast.windspeed_10m : 0)+";color:white;text-align:center;border-radius:25px;padding: 5px 3px;position: relative;top: 20px;' class='marker-pin'>"+((forecast) ? forecast.windspeed_10m : 0)+"</div>";
+            break;
+        }
    
         const icon = L.divIcon({
           className: 'custom-div-icon',
-          html: "<div title=\""+_location.name+"\" style='background-color:"+this.getTemperatureColor((forecast) ? forecast.temperature_2m : 0)+";color:white;text-align:center;border-radius:25px;padding: 5px 3px;position: relative;top: 20px;' class='marker-pin'>"+((forecast) ? forecast.temperature_2m : 0)+"</div>",
+          html: iconHtml,
           iconSize: [30, 42],
           iconAnchor: [15, 42]
         });
-        
-        L.marker([lat, lng], { icon: icon }).addTo(this.map);
+
+        const marker = L.marker([lat, lng], { icon: icon });
+        this.mapMarkers.push(marker);
+        marker.addTo(this.map);
       });      
 
-      tiles.addTo(this.map);
+      
     }, 1000);    
   }
 
   private getTemperatureColor(temp: number): string {
     return this.meteoService.getTemperatureColor(temp);
+  }
+
+  private getPrecipitationColor(precipitation: number): string {
+    return this.meteoService.getPrecipitationColor(precipitation);
+  }
+
+  private getWindSpeedColor(windSpeed: number): string {
+    return this.meteoService.getWindSpeedColor(windSpeed);
   }
 
   ngOnInit(): void {

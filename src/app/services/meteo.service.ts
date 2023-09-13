@@ -77,4 +77,52 @@ export class MeteoService {
     }
     return colors[colIdx];
   }
+
+  getPrecipitationColor(precipitation: number): string {
+    const colors: string[] = ['#ffffff','#3FA0FF','#72D8FF','#AAF7FF','#E0FFFF'];
+    let colIdx: number = 0;
+    if (precipitation===0) {
+      colIdx = 0;
+    } else if (precipitation>0 && precipitation<=10) {
+      colIdx = 1;
+    } else if (precipitation>10 && precipitation<=20) {
+      colIdx = 2;
+    } else if (precipitation>30 && precipitation<=40) {
+      colIdx = 3;
+    } else if (precipitation>40 && precipitation<=50) {
+      colIdx = 4;
+    }
+    return colors[colIdx];
+  }
+
+  getWindSpeedColor(speed: number): string {
+    const colors: string[] = ['#264CFF','#3FA0FF','#72D8FF','#AAF7FF','#E0FFFF','#FFFFBF','#FFE099','#FFAD72','#F76D5E','#D82632','#A50021', '#A50021'];
+    let colIdx: number = 0;
+    if (speed===0) {
+      colIdx = 0;
+    } else if (speed>0 && speed<=10) {
+      colIdx = 1;
+    } else if (speed>10 && speed<=20) {
+      colIdx = 2;
+    } else if (speed>20 && speed<=30) {
+      colIdx = 3;
+    } else if (speed>30 && speed<=40) {
+      colIdx = 4;
+    } else if (speed>40 && speed<=50) {
+      colIdx = 5;
+    } else if (speed>50 && speed<=60) {
+      colIdx = 6;
+    } else if (speed>60 && speed<=70) {
+      colIdx = 7;
+    } else if (speed>70 && speed<=80) {
+      colIdx = 8;
+    } else if (speed>80 && speed<=90) {
+      colIdx = 9;
+    } else if (speed>90 && speed<100) {
+      colIdx = 10;
+    } else if (speed>100) {
+      colIdx = 11;
+    }
+    return colors[colIdx];
+  }
 }

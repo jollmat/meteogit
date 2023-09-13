@@ -123,17 +123,36 @@
                                             </button>
                                         </div>
                                     </div>
-                                    <ng-container *ngIf="tableViewType==='GENERAL'">
+                                    <ng-container *ngIf="tableViewType==='GENERAL'">                                        
+                                        <ng-container *ngIf="generalTableViewType==='MAP'">
+                                            <div class="btn-group" role="group" aria-label="Basic example">
+                                                <button type="button" class="btn btn-secondary" 
+                                                    [ngClass]="{active: mapValueType==='TEMPERATURE'}"
+                                                    (click)="mapValueType='TEMPERATURE';initMap()">Temperature (ºC)</button>
+                                                <button type="button" class="btn btn-secondary" 
+                                                    [ngClass]="{active: mapValueType==='APPARENT_TEMPERATURE'}"
+                                                    (click)="mapValueType='APPARENT_TEMPERATURE';initMap()">Apparent temperature (ºC)</button>
+                                                <button type="button" class="btn btn-secondary" 
+                                                    [ngClass]="{active: mapValueType==='PRECIPITATION'}"
+                                                    (click)="mapValueType='PRECIPITATION';initMap()">Precipitation (mm)</button>
+                                                <button type="button" class="btn btn-secondary" 
+                                                    [ngClass]="{active: mapValueType==='WIND_SPEED'}"
+                                                    (click)="mapValueType='WIND_SPEED';initMap()">Wind speed (Km/h)</button>
+                                            </div>
+                                        </ng-container>
+
                                         <div ngbDropdown class="d-inline-block me-3 mb-2">
                                             <button type="button" class="btn" id="dropdownBasic3" [disabled]="selectedLocations.length===0" ngbDropdownToggle>
                                                 <span *ngIf="generalTableViewType==='TABLE'">Table</span>
                                                 <span *ngIf="generalTableViewType==='MAP'">Map</span>
                                             </button>
                                             <div ngbDropdownMenu aria-labelledby="dropdownBasic3">
-                                                <button ngbDropdownItem class="p-2" *ngIf="generalTableViewType!=='TABLE'" (click)="generalTableViewType='TABLE'">
+                                                <button ngbDropdownItem class="p-2" *ngIf="generalTableViewType!=='TABLE'" 
+                                                    (click)="generalTableViewType='TABLE'">
                                                     Table
                                                 </button>
-                                                <button ngbDropdownItem class="p-2" *ngIf="generalTableViewType!=='MAP'" (click)="generalTableViewType='MAP';initMap()">
+                                                <button ngbDropdownItem class="p-2" *ngIf="generalTableViewType!=='MAP'" 
+                                                    (click)="generalTableViewType='MAP';mapValueType='TEMPERATURE';initMap()">
                                                     Map
                                                 </button>                                            
                                             </div>
