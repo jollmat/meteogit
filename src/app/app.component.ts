@@ -414,15 +414,34 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
     this.setSelectedLocation((this.selectedLocation===locationId)? undefined : locationId);
   }
 
+  private getMapCenter(): {lat: number, lng:number} {
+    let lat: number = 0;
+    let lng: number = 0;
+
+    this.selectedLocations.forEach((_location) => {
+      lat += _location.latitude;
+      lng += _location.longitude;
+    });
+
+    lat /= this.selectedLocations.length;
+    lng /= this.selectedLocations.length;
+
+    return {
+      lat: lat,
+      lng: lng
+    }
+  }
+
   initMap() {
 
     setTimeout(() => {
 
       if (!this.map) {
+        const center: {lat: number, lng:number} = this.getMapCenter();
         this.map = L.map('map', {
-          center: [48.20807,16.37320],
+          center: [center.lat,center.lng],
           attributionControl: false,
-          zoom: 4
+          zoom: 6
         });
     
         const tiles = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -456,10 +475,10 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
             iconHtml = "<div title=\""+_location.name+"\" style='background-color:"+this.getTemperatureColor((forecast) ? forecast.apparent_temperature : 0)+";color:white;text-align:center;border-radius:25px;padding: 5px 3px;position: relative;top: 20px;' class='marker-pin'>"+((forecast) ? forecast.apparent_temperature : 0)+"</div>";
             break;
           case 'PRECIPITATION':
-            iconHtml = "<div title=\""+_location.name+"\" style='color:blue;background-color:"+this.getPrecipitationColor((forecast) ? forecast.precipitation : 0)+";text-align:center;border-radius:25px;padding: 5px 3px;position: relative;top: 20px;' class='marker-pin'>"+((forecast) ? forecast.precipitation : 0)+"</div>";
+            iconHtml = "<div title=\""+_location.name+"\" style='color:blue;background-color:"+this.getPrecipitationColor((forecast) ? forecast.precipitation : 0)+";color:"+this.getPrecipitationFontColor((forecast) ? forecast.precipitation : 0)+";text-align:center;border-radius:25px;padding: 5px 3px;position: relative;top: 20px;' class='marker-pin'>"+((forecast) ? forecast.precipitation : 0)+"</div>";
             break;
           case 'WIND_SPEED':
-            iconHtml = "<div title=\""+_location.name+"\" style='background-color:"+this.getWindSpeedColor((forecast) ? forecast.windspeed_10m : 0)+";color:white;text-align:center;border-radius:25px;padding: 5px 3px;position: relative;top: 20px;' class='marker-pin'>"+((forecast) ? forecast.windspeed_10m : 0)+"</div>";
+            iconHtml = "<div title=\""+_location.name+"\" style='background-color:"+this.getWindSpeedColor((forecast) ? forecast.windspeed_10m : 0)+";color:"+this.getWindSpeedFontColor((forecast) ? forecast.windspeed_10m : 0)+";text-align:center;border-radius:25px;padding: 5px 3px;position: relative;top: 20px;' class='marker-pin'>"+((forecast) ? forecast.windspeed_10m : 0)+"</div>";
             break;
         }
    
@@ -486,9 +505,16 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
   private getPrecipitationColor(precipitation: number): string {
     return this.meteoService.getPrecipitationColor(precipitation);
   }
+  private getPrecipitationFontColor(precipitation: number): string {
+    return this.meteoService.getPrecipitationFontColor(precipitation);
+  }
 
   private getWindSpeedColor(windSpeed: number): string {
     return this.meteoService.getWindSpeedColor(windSpeed);
+  }
+
+  private getWindSpeedFontColor(windSpeed: number): string {
+    return this.meteoService.getWindSpeedFontColor(windSpeed);
   }
 
   ngOnInit(): void {

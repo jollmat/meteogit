@@ -95,8 +95,15 @@ export class MeteoService {
     return colors[colIdx];
   }
 
+  getPrecipitationFontColor(precipitation: number): string {
+    if (precipitation<=20) {
+      return '#190253';
+    }
+    return '#fff';
+  }
+
   getWindSpeedColor(speed: number): string {
-    const colors: string[] = ['#f288fc','#df7bec','#cd6fdd','#bb63cd','#a957be','#974baf','#863fa0','#763391','#652883','#551d74','#451166', '#360558'];
+    const colors: string[] = ['#f288fc','#f288fc','#cd6fdd','#bb63cd','#a957be','#974baf','#863fa0','#763391','#652883','#551d74','#451166', '#360558'];
     let colIdx: number = 0;
     if (speed===0) {
       colIdx = 0;
@@ -124,5 +131,9 @@ export class MeteoService {
       colIdx = 11;
     }
     return colors[colIdx];
+  }
+
+  getWindSpeedFontColor(speed: number): string {
+    return speed<30 ? '#360558' : '#ffffff';
   }
 }
